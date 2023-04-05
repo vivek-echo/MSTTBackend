@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Crypt;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 
@@ -17,7 +18,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login','signUp']]);
+        $this->middleware('auth:api', ['except' => ['login', 'signUp', 'checkUser', 'validateOtp']]);
     }
 
     /**
@@ -27,11 +28,9 @@ class AuthController extends Controller
      */
     public function login()
     {
-        
         $credentials = request(['email', 'password']);
-      
-        if (! $token = auth()->attempt($credentials)) {
-            return response()->json(['status' => false,'message' =>"Invalid Credentials"], 401);
+        if (!$token = auth()->attempt($credentials)) {
+            return response()->json(['status' => false, 'message' => "Invalid Credentials"], 401);
         }
 
         return $this->respondWithToken($token);
@@ -78,32 +77,114 @@ class AuthController extends Controller
      */
     protected function respondWithToken($token)
     {
+        DB::table('users')->where('id', Auth::user()->id)->update([
+            'otp' => null
+        ]);
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60,
-            'data'=> $this->me()
+            'data' => Auth::user()
         ]);
     }
 
-    public function signUp(){
+    public function signUp()
+    {
+
         $getData = request()->all();
-        $ins['name'] =$getData['name']; 
-        $ins['email'] =$getData['email']; 
-        $ins['password'] =Hash::make($getData['password']); 
-        $user =DB::table('users')->insert($ins); 
-        if($user){
-            $msg= "User registred Succesfully";
-            $status= true;
+        $ins['memberType'] = $getData['memeberType'];
+        $ins['firstname'] = $getData['firstName'];
+        $ins['lastname'] = $getData['lastName'];
+        $ins['email'] = $getData['email'];
+        $ins['shopname'] = $getData['shopName'];
+        $ins['dob'] = $getData['dob'];
+        $ins['mobile'] = $getData['mobileNo'];
+        $ins['address'] = $getData['address'];
+        $ins['gender'] = $getData['gender'];
+        $ins['password'] = Hash::make($getData['password']);
+        $user = DB::table('users')->insert($ins);
+        if ($user) {
+            $msg = "User registred Succesfully";
+            $status = true;
             $code = 200;
-        }else{
-            $msg= "something went wrong.please try again later.";
-            $status= false;
-            $code=400;
+        } else {
+            $msg = "something went wrong.please try again later.";
+            $status = false;
+            $code = 400;
         }
         return response()->json([
             'status' =>  $status,
-            'msg'=>$msg
+            'msg' => $msg
         ], $code);
+    }
+
+    public function checkUser()
+    {
+        $status = '';
+        $msg = "";
+        $otp = '';
+        // dd("vjnhnh");
+        $getData = request()->all();
+        // $credentials = request(['email', 'password']);
+        $exist = DB::table('users')->where('email', $getData['email'])->first();
+        if ($exist) {
+            if (Hash::check($getData['password'], $exist->password)) {
+                $otp = mt_rand(100000, 999999);
+                $ottps = $otp;
+                $updateOtp =  DB::table('users')->where('id', $exist->id)->update([
+                    'otp' => $otp
+                ]);
+                if ($updateOtp) {
+                    $status = 200;
+                    $msg = "Otp Sent to your registered Email.";
+                    $otp = Crypt::encryptString($otp);
+                } else {
+                    $status = 400;
+                    $msg = "Something Went Wrong .Please try again later";
+                    $otp = '';
+                }
+            } else {
+                $status = 400;
+                $msg = "Incorrect Password.Please check";
+                $otp = '';
+            }
+        } else {
+            $status = 400;
+            $msg = "Invalid user.Please check";
+            $otp = '';
+        }
+        return response()->json([
+            'status' =>  $status,
+            'msg' => $msg,
+            'otp' => $otp, ' ottps' => $ottps
+        ], $status);
+    }
+
+    public function validateOtp()
+    {
+        $status = '';
+        $msg = "";
+        $getData = request()->all();
+
+        $getOtp = $getData['userOtp'];
+        $valOtp = Crypt::decryptString($getData['otp']);
+
+        if ($getOtp === $valOtp) {
+            $credentials['email'] = $getData['email'];
+            $credentials['password'] = $getData['password'];
+
+            if (!$token = auth()->attempt($credentials)) {
+                return response()->json(['status' => false, 'message' => "Invalid Credentials"], 401);
+            }
+
+            return $this->respondWithToken($token);
+        } else {
+            $status = 400;
+            $msg = "Invalid OTP.Please check";
+            return response()->json([
+                'status' =>  $status,
+                'msg' => $msg
+            ], $status);
+        }
     }
 }
