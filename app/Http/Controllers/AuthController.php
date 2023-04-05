@@ -166,10 +166,10 @@ class AuthController extends Controller
         $msg = "";
         $getData = request()->all();
 
-        $getOtp = $getData['userOtp'];
-        $valOtp = Crypt::decryptString($getData['otp']);
+        $getOtp =  DB::table('users')->where('email', $getData['email'])->first()->otp;
+        $valOtp = $getData['userOtp'];
 
-        if ($getOtp === $valOtp) {
+        if ($getOtp == $valOtp) {
             $credentials['email'] = $getData['email'];
             $credentials['password'] = $getData['password'];
 
