@@ -24,11 +24,11 @@ Route::group([
     Route::match(['GET', 'POST'], 'validateOtp', [App\Http\Controllers\AuthController::class, 'validateOtp']);
     Route::match(['GET', 'POST'], 'login', [App\Http\Controllers\AuthController::class, 'login'])->name('login');
     Route::post('signUp',[App\Http\Controllers\AuthController::class, 'signUp']);
-    
-    // Route::post('login', function(){
-    //     return "vcsjnchjsn";
-    // });
     Route::post('logout', 'AuthController@logout');
     Route::post('refresh', 'AuthController@refresh');
     Route::post('me', 'AuthController@me');
+
+
+    Route::match(['GET', 'POST'], 'addCar', [App\Http\Controllers\CarBooking\AddCarController::class, 'addCar']);
+
 });
