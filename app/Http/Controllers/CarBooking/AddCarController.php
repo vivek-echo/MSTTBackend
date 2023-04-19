@@ -9,11 +9,12 @@ use Illuminate\Support\Facades\Crypt;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
-
+use Illuminate\Support\Facades\Http;
 class AddCarController extends Controller
 {
     public function addCar()
     {
+        
         $statusCode = $this->errorStatusCode;
         $statusResponse = $this->errorStatusResponse;
         $status = $this->errorStatus;
@@ -99,4 +100,5 @@ class AddCarController extends Controller
         ],$statusCode);
 
     }
+
 }

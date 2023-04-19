@@ -20,6 +20,11 @@ Route::group([
 
 ], function () {
     
+    Route::match(['GET', 'POST'], 'getState', [App\Http\Controllers\CommonController::class, 'getState']);
+    Route::match(['GET', 'POST'], 'getCity', [App\Http\Controllers\CommonController::class, 'getCity']);
+
+
+
     Route::match(['GET', 'POST'], 'checkUser', [App\Http\Controllers\AuthController::class, 'checkUser']);
     Route::match(['GET', 'POST'], 'validateOtp', [App\Http\Controllers\AuthController::class, 'validateOtp']);
     Route::match(['GET', 'POST'], 'login', [App\Http\Controllers\AuthController::class, 'login'])->name('login');
