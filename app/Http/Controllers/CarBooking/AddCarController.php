@@ -101,4 +101,47 @@ class AddCarController extends Controller
 
     }
 
+    public function viewCar(){
+        $statusCode = $this->errorStatusCode;
+        $statusResponse = $this->errorStatusResponse;
+        $status = $this->errorStatus;
+        $msg = "";
+        $responseData = [];
+        $getData = request()->all();
+        $validator = Validator::make($getData, [
+            'userId'=>"required"
+        ]);
+
+        if ($validator->fails()) {
+            return $this->valMsg($validator->errors());
+        }
+
+        try{
+           $data= DB::table('addCar')->where('deletedFlag',0)->get();
+           $responseData =  $data;
+        }catch (\Exception $t) {
+            DB::rollBack();
+            Log::error("Error", [
+                'Controller' => 'MasterDataController',
+                'Method' => 'studentMasterData',
+                'Error' => $t->getMessage(),
+            ]);
+
+            $statusCode = $this->errorStatusCode;
+            $statusResponse = $this->errorStatusResponse;
+            $status = $this->errorStatus;
+            $msg = "Something went wrong. please try again later.";
+            
+        }
+
+        return response()->json([
+            'statusCode'=> $statusCode,
+            'statusResponse'=>$statusResponse,
+            'status'=>$status,
+            'msg'=>$msg,
+            'responseData' =>$responseData
+        ],$statusCode);
+
+    }
+
 }

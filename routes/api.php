@@ -25,6 +25,7 @@ Route::group([
 
 
 
+
     Route::match(['GET', 'POST'], 'checkUser', [App\Http\Controllers\AuthController::class, 'checkUser']);
     Route::match(['GET', 'POST'], 'validateOtp', [App\Http\Controllers\AuthController::class, 'validateOtp']);
     Route::match(['GET', 'POST'], 'login', [App\Http\Controllers\AuthController::class, 'login'])->name('login');
@@ -35,5 +36,6 @@ Route::group([
 
 
     Route::match(['GET', 'POST'], 'addCar', [App\Http\Controllers\CarBooking\AddCarController::class, 'addCar']);
+    Route::match(['GET', 'POST'], 'viewCar', [App\Http\Controllers\CarBooking\AddCarController::class, 'viewCar']);
 
 });
