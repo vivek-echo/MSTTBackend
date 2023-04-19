@@ -10,14 +10,14 @@ use Illuminate\Routing\Controller as BaseController;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
-    protected $errorStatusCode , $errorstatusResponse , $errorStatus ,$successStatusCode , $successstatusResponse , $successStatus;
+    protected $errorStatusCode , $errorStatusResponse , $errorStatus ,$successStatusCode , $successStatusResponse , $successStatus;
     public function __construct()
     {
         $this->errorStatusCode =  400; 
-        $this->errorstatusResponse = false ; 
+        $this->errorStatusResponse = false ; 
         $this->errorStatus = "INVALID"; 
         $this->successStatusCode = 200; 
-        $this->successstatusResponse = true; 
+        $this->successStatusResponse = true; 
         $this->successStatus = "SUCCESS";
     }
 
@@ -29,7 +29,7 @@ class Controller extends BaseController
         $msg = implode(',',$msg);
         return response()->json([
             'statusCode' => $this->errorStatusCode,
-            'statusResponse' => $this->errorstatusResponse ,
+            'statusResponse' => $this->errorStatusResponse ,
             'status' => $this->errorStatus,
             'msg'=> $msg
         ],$this->errorStatusCode);
