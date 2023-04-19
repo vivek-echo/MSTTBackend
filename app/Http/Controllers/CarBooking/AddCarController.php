@@ -14,12 +14,13 @@ class AddCarController extends Controller
 {
     public function addCar()
     {
-        
+       
         $statusCode = $this->errorStatusCode;
         $statusResponse = $this->errorStatusResponse;
         $status = $this->errorStatus;
         $msg = "";
         $getData = request()->all();
+        
         $validator = Validator::make($getData, [
             'userId'=>"required",
             'carType'  => "required",
@@ -43,34 +44,33 @@ class AddCarController extends Controller
         if ($validator->fails()) {
             return $this->valMsg($validator->errors());
         }
-
+       
         try{
 
             DB::beginTransaction();
-                $ins['userId'] = $getData['userId']; 
-                $ins['carType'] = $getData['carType']; 
-                $ins['carBrand'] = $getData['carBrand']; 
-                $ins['carYear'] = $getData['carYear']; 
-                $ins['fuelType'] = $getData['fuelType']; 
-                $ins['milage'] = $getData['mileage']; 
-                $ins['ownerName'] = $getData['ownerName']; 
-                $ins['stateId'] = $getData['stateId']; 
-                $ins['stateName'] = $getData['stateName']; 
-                $ins['cityId'] = $getData['cityId']; 
-                $ins['cityName'] = $getData['cityName']; 
-                $ins['address'] = $getData['address']; 
-                $ins['rcNo'] = $getData['RCNo']; 
-                $ins['chassisNo'] = $getData['chassisNo']; 
-                $ins['insValidFrom'] = $getData['insuranceValidFrom'];
-                $ins['insValidTill'] = $getData[''];
-                $ins['pollutionValidFrom'] = $getData['pollutionValidTill']; 
-                $ins['pollutionValidTill'] = $getData['insuranceValidTill']; 
-                $ins['createdOn'] =now(); 
-
+            $ins['userId'] = $getData['userId']; 
+            $ins['carType'] = $getData['carType']; 
+            $ins['carBrand'] = $getData['carBrand']; 
+            $ins['carYear'] = date('Y-m-d', strtotime($getData['carYear']))  ; 
+            $ins['fuelType'] = $getData['fuelType']; 
+            $ins['milage'] = $getData['mileage']; 
+            $ins['ownerName'] = $getData['ownerName']; 
+            $ins['stateId'] = $getData['stateId']; 
+            $ins['stateName'] = $getData['stateName']; 
+            $ins['cityId'] = $getData['cityId']; 
+            $ins['cityName'] = $getData['cityName']; 
+            $ins['address'] = $getData['address']; 
+            $ins['rcNo'] = $getData['RCNo']; 
+            $ins['chassisNo'] = $getData['chassisNo']; 
+            $ins['insValidFrom'] = date('Y-m-d', strtotime($getData['insuranceValidFrom']));
+            $ins['insValidTill'] =date('Y-m-d', strtotime($getData['insuranceValidTill'])) ;
+            $ins['pollutionValidFrom'] =date('Y-m-d', strtotime($getData['pollutionValidTill'])); 
+            $ins['pollutionValidTill'] =date('Y-m-d', strtotime($getData['insuranceValidTill']))  ; 
+            $ins['createdOn'] =now(); 
                 $trans = DB::transaction(function () use ($ins) { 
                    DB::table('addCar')->insert($ins);
                 });
-                if( $trans){
+                if( is_null($trans)){
                     $statusCode = $this->successStatusCode;
                     $statusResponse = $this->successStatusResponse;
                     $status = $this->successStatus;
@@ -119,6 +119,10 @@ class AddCarController extends Controller
         try{
            $data= DB::table('addCar')->where('deletedFlag',0)->get();
            $responseData =  $data;
+           $statusCode = $this->successStatusCode;
+           $statusResponse = $this->successStatusResponse;
+           $status = $this->successStatus;
+           $msg = "Data genertated succesfully";
         }catch (\Exception $t) {
             DB::rollBack();
             Log::error("Error", [
