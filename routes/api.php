@@ -32,8 +32,7 @@ Route::group([
     Route::post('logout', 'AuthController@logout');
     Route::post('refresh', 'AuthController@refresh');
     Route::post('me', 'AuthController@me');
-
-
+    
     Route::match(['GET', 'POST'], 'addCar', [App\Http\Controllers\CarBooking\AddCarController::class, 'addCar']);
     Route::match(['GET', 'POST'], 'viewCar', [App\Http\Controllers\CarBooking\AddCarController::class, 'viewCar']);
 

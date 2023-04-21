@@ -16,7 +16,7 @@ class CORS
      */
     public function handle(Request $request, Closure $next)
     {
- 
+        // dd($request);
         $response = $next($request);
         $IlluminateResponse = 'Illuminate\Http\Response';
         $SymfonyResopnse = 'Symfony\Component\HttpFoundation\Response';
@@ -39,7 +39,7 @@ class CORS
             }
             return $response;
         }
-
+       
         return $response;
     }
 }

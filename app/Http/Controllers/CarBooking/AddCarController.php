@@ -12,14 +12,15 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 class AddCarController extends Controller
 {
+    
     public function addCar()
     {
-       
         $statusCode = $this->errorStatusCode;
         $statusResponse = $this->errorStatusResponse;
         $status = $this->errorStatus;
         $msg = "";
         $getData = request()->all();
+        
         
         $validator = Validator::make($getData, [
             'userId'=>"required",
@@ -48,7 +49,7 @@ class AddCarController extends Controller
         try{
 
             DB::beginTransaction();
-            $ins['userId'] = $getData['userId']; 
+            $ins['userId'] = Crypt::decryptString($getData['userId']); 
             $ins['carType'] = $getData['carType']; 
             $ins['carBrand'] = $getData['carBrand']; 
             $ins['carYear'] = date('Y-m-d', strtotime($getData['carYear']))  ; 

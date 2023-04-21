@@ -54,7 +54,6 @@ class CommonController extends Controller
         if ($validator->fails()) {
             return $this->valMsg($validator->errors());
         }
-
         $data = DB::table('city')->select('cityId', 'cityName')->where('stateId',$getData['stateId'])->get();
         if (!$data->isEmpty()) {
             $statusCode = $this->successStatusCode;
