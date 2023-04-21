@@ -30,9 +30,9 @@ class AddCarController extends Controller
             'mileage' => "required",
             'ownerName' => "required",
             'stateId' => "required|integer|gt:0",
-            'stateName' => "required",
+            // 'stateName' => "required",
             'cityId'=>"required|integer|gt:0",
-            'cityName' => "required",
+            // 'cityName' => "required",
             'address' => "required",
             'RCNo' => "required",
             'chassisNo' => "required",
@@ -56,9 +56,9 @@ class AddCarController extends Controller
             $ins['milage'] = $getData['mileage']; 
             $ins['ownerName'] = $getData['ownerName']; 
             $ins['stateId'] = $getData['stateId']; 
-            $ins['stateName'] = $getData['stateName']; 
+            // $ins['stateName'] = $getData['stateName']; 
             $ins['cityId'] = $getData['cityId']; 
-            $ins['cityName'] = $getData['cityName']; 
+            // $ins['cityName'] = $getData['cityName']; 
             $ins['address'] = $getData['address']; 
             $ins['rcNo'] = $getData['RCNo']; 
             $ins['chassisNo'] = $getData['chassisNo']; 

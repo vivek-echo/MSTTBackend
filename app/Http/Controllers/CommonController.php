@@ -35,7 +35,7 @@ class CommonController extends Controller
             'statusResponse' => $statusResponse,
             'status' => $status,
             'msg' => $msg,
-            'sateData' => $sateData
+            'stateData' => $sateData
         ], $statusCode);
     }
 
