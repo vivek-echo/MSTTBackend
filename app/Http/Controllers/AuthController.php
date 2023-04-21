@@ -80,10 +80,11 @@ class AuthController extends Controller
         DB::table('users')->where('id', Auth::user()->id)->update([
             'otp' => null
         ]);
-        
+
         $loginData['id']= Crypt::encryptString(Auth::user()->id) ;
         $loginData['firstname']= Auth::user()->firstname ;
         $loginData['lastName']= Auth::user()->lastName;
+        $loginData['memberType']= Auth::user()->memberType;
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
