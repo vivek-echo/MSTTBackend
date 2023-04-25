@@ -33,7 +33,7 @@ return [
 
     'paths' => ['api/*'],
     'allowed_methods' => ['POST', 'GET', 'DELETE', 'PUT', '*'],
-    'allowed_origins' => ['http://localhost:4200'],
+    'allowed_origins' => ['http://msttindia.in/MSTT/','http://localhost:4200'],
     'allowed_origins_patterns' => [],
     'allowed_headers' => ['X-Custom-Header', 'Upgrade-Insecure-Requests', '*'],
     'exposed_headers' => [],
