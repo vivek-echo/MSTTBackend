@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendRegisterOtp;
+use App\Mail\LoginOtp;
 
 class AuthController extends Controller
 {
@@ -150,6 +151,12 @@ class AuthController extends Controller
                 if ($updateOtp) {
                     $status = 200;
                     $msg = "Otp Sent to your registered Email.";
+                    $maildata = [
+                        'name' => $exist->firstname ." ".$exist->lastname,
+                        'email'=>$getData['email'] , 
+                        'otp'=>$otp
+                    ];
+                    $this->loginMailOtp( $maildata);
                     $otp = Crypt::encryptString($otp);
                 } else {
                     $status = 400;
@@ -169,7 +176,7 @@ class AuthController extends Controller
         return response()->json([
             'status' =>  $status,
             'msg' => $msg,
-            'otp' => $otp, ' ottps' => $ottps
+            'otp' => $otp, 'ottps' => $ottps
         ], $status);
     }
 
@@ -238,6 +245,11 @@ class AuthController extends Controller
     public function sendregotp($data)
     {
         Mail::to($data['email'])->send(new SendRegisterOtp($data));
+    }
+
+    public function loginMailOtp($data)
+    {
+        Mail::to($data['email'])->send(new LoginOtp($data));
     }
 
     public function validateRegisterOtp()
