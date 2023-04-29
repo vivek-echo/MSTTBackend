@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
+Route::match(['GET', 'POST'], 'sendRegisterOtp', [App\Http\Controllers\AuthController::class, 'sendRegisterOtp']);
+Route::match(['GET', 'POST'], 'validateRegisterOtp', [App\Http\Controllers\AuthController::class, 'validateRegisterOtp']);
 Route::group([
 
     'middleware' => 'api'
@@ -28,6 +29,7 @@ Route::group([
     Route::match(['GET', 'POST'], 'checkUser', [App\Http\Controllers\AuthController::class, 'checkUser']);
     Route::match(['GET', 'POST'], 'validateOtp', [App\Http\Controllers\AuthController::class, 'validateOtp']);
     Route::match(['GET', 'POST'], 'login', [App\Http\Controllers\AuthController::class, 'login'])->name('login');
+    
     Route::post('signUp',[App\Http\Controllers\AuthController::class, 'signUp']);
     Route::post('logout', 'AuthController@logout');
     Route::post('refresh', 'AuthController@refresh');

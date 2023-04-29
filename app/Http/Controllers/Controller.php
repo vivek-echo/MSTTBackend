@@ -19,6 +19,7 @@ class Controller extends BaseController
         $this->successStatusCode = 200; 
         $this->successStatusResponse = true; 
         $this->successStatus = "SUCCESS";
+     
     }
 
     public function valMsg($errors){

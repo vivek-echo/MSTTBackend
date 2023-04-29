@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Crypt;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SendRegisterOtp;
 
 class AuthController extends Controller
 {
@@ -18,7 +20,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'signUp', 'checkUser', 'validateOtp']]);
+        $this->middleware('auth:api', ['except' => ['login', 'signUp', 'checkUser','validateRegisterOtp', 'validateOtp', 'sendRegisterOtp', 'sendregotp']]);
     }
 
     /**
@@ -81,10 +83,10 @@ class AuthController extends Controller
             'otp' => null
         ]);
 
-        $loginData['id']= Crypt::encryptString(Auth::user()->id) ;
-        $loginData['firstname']= Auth::user()->firstname ;
-        $loginData['lastName']= Auth::user()->lastName;
-        $loginData['memberType']= Auth::user()->memberType;
+        $loginData['id'] = Crypt::encryptString(Auth::user()->id);
+        $loginData['firstname'] = Auth::user()->firstname;
+        $loginData['lastName'] = Auth::user()->lastName;
+        $loginData['memberType'] = Auth::user()->memberType;
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
@@ -97,6 +99,8 @@ class AuthController extends Controller
     {
 
         $getData = request()->all();
+
+
         $ins['memberType'] = $getData['memeberType'];
         $ins['firstname'] = $getData['firstName'];
         $ins['lastname'] = $getData['lastName'];
@@ -110,17 +114,21 @@ class AuthController extends Controller
         $user = DB::table('users')->insert($ins);
         if ($user) {
             $msg = "User registred Succesfully";
-            $status = true;
-            $code = 200;
+            $statusResponse = true;
+            $statusCode = 200;
+            $status = 'SUCCESS';
         } else {
             $msg = "something went wrong.please try again later.";
-            $status = false;
-            $code = 400;
+            $statusResponse = false;
+            $statusCode = 400;
+            $status = 'ERROR';
         }
         return response()->json([
-            'status' =>  $status,
+            'statusCode' => $statusCode,
+            'statusResponse' => $statusResponse,
+            'status' => $status,
             'msg' => $msg
-        ], $code);
+        ], $statusCode);
     }
 
     public function checkUser()
@@ -179,17 +187,85 @@ class AuthController extends Controller
             $credentials['password'] = $getData['password'];
 
             if (!$token = auth()->attempt($credentials)) {
-                return response()->json(['status' => false, 'message' => "Invalid Credentials"], 401);
+                return response()->json(['status' => false, 'message' => "Invalid Credentials"],  400);
             }
 
             return $this->respondWithToken($token);
         } else {
-            $status = 400;
+            $status =  400;
             $msg = "Invalid OTP.Please check";
             return response()->json([
                 'status' =>  $status,
                 'msg' => $msg
             ], $status);
         }
+    }
+
+    public function sendRegisterOtp()
+    {
+        $getData = request()->all();
+        $msg = "";
+        $status =  "INVALID";
+        $statusCode =  400;
+        $statusResponse =  false;
+        $otp = "";
+        $otpEnc = "";
+        $checkUser = DB::table('users')->where('deletedFlag', 0)->where('email', $getData['email'])->count('id');
+        $checkMobile = DB::table('users')->where('deletedFlag', 0)->where('mobile', 9031976434)->count('id');
+        if ($checkUser > 0 && $checkMobile > 0) {
+            $msg = "User Allready Exists.Please try with different Email and Mobile No.";
+        } else {
+            $otp = mt_rand(100000, 999999);
+            $otpEnc = Crypt::encryptString($otp);
+            $msg = "Otp has been Sent to Your Emial and Mobile No.";
+            $status =  "SUCCESS";
+            $statusCode =  200;
+            $statusResponse =  true;
+            array_push($getData, ['otp' => $otp]);
+            $this->sendregotp($getData);
+        }
+
+        return response()->json([
+            'statusCode' => $statusCode,
+            'statusResponse' => $statusResponse,
+            'status' => $status,
+            'msg' => $msg,
+            'otpEnc' => $otpEnc,
+            'otp' => $otp
+        ], $statusCode);
+    }
+
+    public function sendregotp($data)
+    {
+        Mail::to($data['email'])->send(new SendRegisterOtp($data));
+    }
+
+    public function validateRegisterOtp()
+    {
+        $getData = request()->all();
+        $status =  "INVALID";
+        $statusCode =  400;
+        $statusResponse =  false;
+        $msg = "";
+
+
+        $otp = $getData['otp'];
+        $encotp = Crypt::decryptString($getData['encOtp']);
+        if ($otp == $encotp) {
+
+            $msg = "OTP is valid";
+            $status =  "SUCCESS";
+            $statusCode =  200;
+            $statusResponse =  true;
+        } else {
+            $msg = "Invalid OTP";
+        }
+
+        return response()->json([
+            'statusCode' => $statusCode,
+            'statusResponse' => $statusResponse,
+            'status' => $status,
+            'msg' => $msg
+        ], $statusCode);
     }
 }
